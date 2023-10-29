@@ -3,6 +3,9 @@ package influencer.bridge.service.serviceImplemantation;
 
 import influencer.bridge.dto.LoginRequestDto;
 import influencer.bridge.dto.RegistrationDto;
+import influencer.bridge.exception.AlreadyExistsException;
+import influencer.bridge.exception.ResourceNotFoundException;
+import influencer.bridge.exception.WrongCredentialsException;
 import influencer.bridge.model.Registration;
 import influencer.bridge.repository.RegistrationRepository;
 import influencer.bridge.service.RegistrationService;
@@ -10,6 +13,7 @@ import influencer.bridge.utility.SuccessResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -27,6 +31,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Autowired
     private RegistrationRepository registrationRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     /**
      * @param registrationDto
@@ -34,14 +41,37 @@ public class RegistrationServiceImpl implements RegistrationService {
      */
     @Override
     public SuccessResponse addUser(RegistrationDto registrationDto) {
+
+
+        if (registrationRepository.findByEmail(registrationDto.getEmail()).isPresent()) {
+            throw new AlreadyExistsException("Email already exists");
+        }
+
         // Convert RegistrationDto to Registration entity
         Registration registration = this.registrationDtoToRegistration(registrationDto);
 
-        // Set the userRole directly
-        registration.setUserRole("user");
+        String encodedPassword = passwordEncoder.encode(registration.getPassword());
 
+        Registration newRegistration = new Registration(
+                0,
+                registration.getFirstName(),
+                registration.getMiddleName(),
+                registration.getLastName(),
+                "user",
+                registration.getEmail(),
+                registration.getFaceBook(),
+                registration.getInstagram(),
+                registration.getTwitter(),
+                registration.getYoutube(),
+                registration.getOthersSocialMediaLink(),
+                registration.getOccupation(),
+                registration.getPhoneNumber(),
+                registration.getDob(),
+                registration.getAddress(),
+                encodedPassword
+        );
         // Save the registration entity to the repository
-        registrationRepository.save(registration);
+        registrationRepository.save(newRegistration);
 
         return new SuccessResponse(HttpStatus.CREATED.value(),"User added Successfully");
     }
@@ -67,22 +97,29 @@ public class RegistrationServiceImpl implements RegistrationService {
     public Map<String, String> loginUser(LoginRequestDto loginRequestDto) {
         Map<String, String> response = new HashMap<>();
 
-        Registration foundRegistration = registrationRepository.getByEmail(loginRequestDto.getEmail());
         String email = loginRequestDto.getEmail();
         String password = loginRequestDto.getPassword();
 
-        Optional<Registration> registrationOptional = registrationRepository.findByEmailAndPassword(email, password);
+        Registration foundRegistration = registrationRepository.getByEmail(email);
 
-        if (registrationOptional.isPresent()) {
-           response.put("message","Login Successful");
-           response.put("status","true");
-           response.put("email",foundRegistration.getEmail());
-        } else {
-            // User not found, return an error message
-            return Map.of("message", "Login failed. Invalid email or password.");
+        if (foundRegistration == null) {
+            // User not found, throw a ResourceNotFoundException
+            throw new ResourceNotFoundException("User with email " + email + " not found");
         }
+
+        if (passwordEncoder.matches(password, foundRegistration.getPassword())) {
+            // Password matches, provide a successful login response
+            response.put("message", "Login Successful");
+            response.put("status", "true");
+            response.put("email", foundRegistration.getEmail());
+        } else {
+            // Password does not match, throw a WrongCredentialsException
+            throw new WrongCredentialsException("Invalid email or password");
+        }
+
         return response;
     }
+
 
     /**
      * @param email

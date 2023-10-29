@@ -27,4 +27,5 @@ public class RegistrationDto {
     private String phoneNumber;
     private String Dob;
     private String address;
+    private String password;
 }

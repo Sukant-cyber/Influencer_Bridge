@@ -27,7 +27,7 @@ public class RegistrationController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/login")
+    @PostMapping(path = "/login")
     public final Map<String, String> loginUser(@RequestBody final LoginRequestDto user){
         Map<String, String> response = registrationService.loginUser(user);
         return response;
