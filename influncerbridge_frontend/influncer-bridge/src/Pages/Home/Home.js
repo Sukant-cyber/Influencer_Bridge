@@ -1,7 +1,14 @@
 import React from 'react'
+import {useNavigate} from 'react-router-dom'
 import './HomeStyle.css'
 
 const Home = () => {
+
+  const navigate = useNavigate();
+
+  const navigateTo = (path) => {
+    navigate(path)
+  }
   return (
     <div className="landing-page">
     <header className="header">
@@ -17,7 +24,7 @@ const Home = () => {
       <div className="hero-content">
         <h2>Connect with Influencers, Build your Brand</h2>
         <p>Take your social media game to the next level.</p>
-        <button className="cta-button">Get Started</button>
+        <button onClick={() => navigateTo('/register')} className="cta-button">Get Started</button>
       </div>
     </section>
   </div>
