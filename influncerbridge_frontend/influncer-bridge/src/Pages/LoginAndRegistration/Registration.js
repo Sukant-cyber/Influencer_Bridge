@@ -1,50 +1,18 @@
-// import React, { useState } from 'react'
-
-// const Registration = () => {
-//     const [firstName, setFirstName] = useState('');
-//     const [middleName, setMiddleName] = useState('');
-//     const [lastName, setLastName] = useState('');
-//     const [email, setEmail] = useState('');
-//     const [faceBook, setFaceBook] = useState('');
-//     const [instagram, setInstagram] = useState('');
-//     const [twitter, setTwitter] = useState('');
-//     const [youtube, setYoutube] = useState('');
-//     const [othersSocialMediaLink, setOthersSocialMediaLink] = useState('');
-//     const [occupation, setOccupations] = useState('');
-//     const [phoneNumber, setPhoneNumber] = useState('');
-//     const [dob, setDob] = useState('');
-//     const [address, setAddress] = useState('');
-//     const [password, setPassword] = useState('');
-
-//     const occupationOptions = [
-//     "Agriculture",
-//     "Business",
-//     "Education",
-//     "Finance",
-//     "Healthcare",
-//     "InformationTechnology",
-//     "Manufacturing",
-//     "Retail",
-//     "ServiceIndustry",
-//     "Student",
-//     "Transportation",
-//     "Unemployed",
-//     "Other"
-//     ]
-//   return (
-//     <div>
-      
-//     </div>
-//   )
-// }
-
-// export default Registration
-
 import React, { useState } from 'react';
 import './RegistrationStyle.css'
 import registrationServiceInstance from '../../Service/RegistrationService';
+import { useNavigate } from 'react-router-dom';
+import Navbar from '../../Components/Navbar/Navbar';
 
 function RegistrationForm() {
+
+  const navigate = useNavigate();
+
+  const navigateTo = (path) => {
+    navigate(path)
+  }
+
+  
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -150,6 +118,8 @@ function RegistrationForm() {
       const response = await registrationServiceInstance.saveUser(registrationData);
       console.log('Registration successful:', response);
 
+      navigateTo('/login')
+
       // Reset the form fields after successful registration
       setFirstName('');
       setMiddleName('');
@@ -171,9 +141,13 @@ function RegistrationForm() {
   };
 
   return (
+    <div>
+      <Navbar/>
+    <div className="registration-page">
     <div className="registration-container">
       <h1>Registration Form</h1>
       <form onSubmit={handleRegistration} className="registration-form">
+        <div className='form-row'>
         <div className="form-group">
           <label>First Name</label>
           <input
@@ -200,7 +174,9 @@ function RegistrationForm() {
             value={lastName}
             onChange={handleInputChange}
           />
+          </div>
         </div>
+        <div className='form-row'>
         <div className="form-group">
           <label>Email</label>
           <input
@@ -227,7 +203,9 @@ function RegistrationForm() {
             value={instagram}
             onChange={handleInputChange}
           />
+          </div>
         </div>
+        <div className='form-row'>
         <div className="form-group">
           <label>Twitter</label>
           <input
@@ -254,7 +232,9 @@ function RegistrationForm() {
             value={othersSocialMediaLink}
             onChange={handleInputChange}
           />
+          </div>
         </div>
+        <div className='form-row'>
         <div className="form-group">
           <label>Occupation</label>
           <select
@@ -287,7 +267,9 @@ function RegistrationForm() {
             value={dob}
             onChange={handleInputChange}
           />
+          </div>
         </div>
+        <div className='form-row'>
         <div className="form-group">
           <label>Address</label>
           <input
@@ -305,12 +287,20 @@ function RegistrationForm() {
             value={password}
             onChange={handleInputChange}
           />
+          </div>
         </div>
         <div className="form-group">
-          <button type="submit">Register</button>
+          <button className='Register-button' type="submit">Register</button>
         </div>
+        <div className="form-group">
+            <p className="login-link">
+               Already have an account? <span onClick={() => navigateTo('/login')} className='login-link-name' > Login here</span>
+            </p>
+          </div>
       </form>
     </div>
+  </div>
+  </div>
   );
 }
 

@@ -17,7 +17,7 @@ const Home = () => {
           <h1>Influencer Bridge</h1>
           <p>Your Gateway to Success</p>
         </div>
-        <button className="sign-in-button">Sign In</button>
+        <button onClick={() => navigateTo('/login')} className="sign-in-button">Sign In</button>
       </div>
     </header>
     <section className="hero">
